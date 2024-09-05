@@ -1,0 +1,44 @@
+body {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    background-image: url(/css/neighpw.jpg);
+    background-size: cover; 
+    background-position: center; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh;
+}
+
+header {
+    position: fixed;
+    top:0;
+    background-color: white;
+    width: 100%;
+    text-align: center;
+}
+
+#options-form{
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff; 
+    width: 250px;
+    padding: 20px;
+    border-radius: 3px;
+    box-shadow: 5px;
+
+    button {
+        font-size: 1em;
+        cursor: pointer;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 3px;
+    }
+  
+    button:hover {
+        background-color: #555; 
+    }
+
+}

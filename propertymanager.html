@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Manager Dashboard</title>
+    <link rel="stylesheet" href="/css/propmanager.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Welcome, <span id="manager-name"></span></h1>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="profile">
+                <img src="/path/to/profile-pic.jpg" alt="Profile Picture">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="propertymanager.html">DASH</a></li>
+                    <li><a href="/documents/map.html">MAP</a></li>
+                    <li><a href="#docs">DOCS</a></li>
+                    <li><a href="#">TICKETS</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <section class="dashboard">
+                <h2>Dashboard</h2>
+                <div class="card-container">
+                    <div class="card">
+                        <h3>New Ticket</h3>
+                        <p>Unit 4C: [Details]</p>
+                    </div>
+                    <div class="card">
+                        <h3>Monthly Profit</h3>
+                        <canvas id="profitGraph"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3>Tenants</h3>
+                        <div id="tenant-list">
+                            <!-- Accepted tenants will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="documents" id="docs">
+                <h3>Tenant Documents</h3>
+                <ul id="document-list">
+                    <!-- Documents will be listed here -->
+                </ul>
+            </section>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Fetch and display the property manager's name
+                const response = await fetch('/get-manager-name');
+                const data = await response.json();
+                document.getElementById('manager-name').textContent = data.name;
+
+                // Fetch and display the tenant documents
+                const docResponse = await fetch('/get-tenant-documents');
+                const documents = await docResponse.json();
+                const documentList = document.getElementById('document-list');
+                documentList.innerHTML = ''; // Clear the list before adding new items
+
+                documents.forEach(doc => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="/download-document/${doc.DocumentID}" target="_blank">${doc.DocumentName}</a>`;
+                    documentList.appendChild(li);
+                });
+
+                // Fetch and display accepted tenants
+                const tenantsResponse = await fetch('/get-accepted-tenants');
+                const tenants = await tenantsResponse.json();
+                const tenantsList = document.getElementById('tenant-list');
+                tenantsList.innerHTML = ''; // Clear previous tenant list
+
+                tenants.forEach(tenant => {
+                    const tenantItem = document.createElement('p');
+                    tenantItem.textContent = tenant.Username;
+                    tenantsList.appendChild(tenantItem);
+                });
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+
+    <form id="send-invite-form">
+        <input type="text" id="tenant-username" placeholder="Enter tenant's username" required>
+        <button type="submit">Send Invite</button>
+    </form>
+    <script>
+        document.getElementById('send-invite-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const tenantUsername = document.getElementById('tenant-username').value;
+
+            try {
+                const response = await fetch('/send-invite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tenantUsername })
+                });
+
+                if (response.ok) {
+                    alert('Invite sent successfully');
+                } else {
+                    alert('Error sending invite');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const profitResponse = await fetch('/monthly-profits');
+            const profitData = await profitResponse.json();
+
+            const ctx = document.getElementById('profitGraph').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Monthly Profit'],
+                    datasets: [{
+                        label: 'Profit in $',
+                        data: [profitData.totalProfit],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+    </script>
+</body>
+</html>

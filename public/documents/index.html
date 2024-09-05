@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PropertyWiz</title>
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to PropertyWiz</h1>
+    </header>
+    <div id="Options">
+        <div id = "options-form">
+        <button id="sign-in-btn">Sign In</button>
+        <button id="register-btn">Register</button>
+    </div>
+    <script>
+        document.getElementById('sign-in-btn').addEventListener('click', () => {
+            window.location.href = '/documents/sign-in.html';
+        });
+        document.getElementById('register-btn').addEventListener('click', () => {
+            window.location.href = '/documents/register.html';
+        });
+    </script>
+    </div>
+</body>
+</html>

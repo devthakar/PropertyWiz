@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property Management</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+  <header>
+    <h1>PropertyWiz</h1>
+  </header>
+  <div id="map"></div>
+  <div id="sidebar" class="sidebar">
+    <button id="close-btn">Close</button>
+    <h2 id="property-name"></h2>
+    <p id="property-details"></p>
+    <p id="lease-duration"></p>
+    <p id="total-earnings"></p>
+    <div id="tickets">
+      <h3>Repair Tickets</h3>
+      <ul id="ticket-list"></ul>
+    </div>
+    <div id="documents">
+      <h3>Documents</h3>
+      <ul id="document-list"></ul>
+    </div>
+  </div>
+  <button id="add-property-btn">Add Property</button>
+  <div id="add-property-form" class="modal">
+    <form id="property-form">
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" required>
+      <label for="name">Property Name:</label>
+      <input type="text" id="name" name="name" required>
+      <label for="details">Details:</label>
+      <input type="text" id="details" name="details" required>
+      <label for="leaseDuration">Lease Duration:</label>
+      <input type="text" id="leaseDuration" name="leaseDuration" required>
+      <label for="totalEarnings">Monthly Rent:</label>
+      <input type="number" id="totalEarnings" name="totalEarnings" required>
+      <label for="tenant">Assign Tenant:</label>
+      <input type="text" id="tenant-input" placeholder="Start typing tenant name" autocomplete="off" required>
+      <ul id="tenant-dropdown" class="dropdown"></ul>
+      <button type="submit">Add Property</button>
+      <button type="button" id="close-form-btn">Cancel</button>
+    </form>
+  </div>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="/js/script.js"></script>
+</body>
+</html>

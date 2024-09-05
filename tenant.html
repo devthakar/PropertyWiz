@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Dashboard</title>
+    <link rel="stylesheet" href="/css/tenant.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome, Tenant</h1>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="profile">
+                <img src="/path/to/profile-pic.jpg" alt="Profile Picture">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="tenant.html">DASH</a></li>
+                    <li><a href="#docs">DOCS</a></li>
+                    <li><a href="#">TICKETS</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <h2>Dashboard</h2>
+
+            <section class="tenant-property">
+                <h3>Your Property</h3>
+                <div id="property-details">
+                </div>
+            </section>
+
+            <section class="documents" id="docs">
+                <h3>Upload Document</h3>
+                <form id="upload-document-form" enctype="multipart/form-data">
+                    <input type="file" id="document-file" name="document" accept="application/pdf" required>
+                    <button type="submit">Upload</button>
+                </form>
+                <h3>Your Documents</h3>
+                <ul id="document-list">
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('upload-document-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData();
+            formData.append('document', document.getElementById('document-file').files[0]);
+
+            try {
+                const response = await fetch('/upload-document', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Document uploaded successfully');
+                    loadDocuments(); 
+                } else {
+                    alert('Error uploading document');
+                }
+            } catch (error) {
+                console.error('Error uploading document:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+
+        async function loadDocuments() {
+            try {
+                const response = await fetch('/get-documents');
+                if (!response.ok) {
+                    throw new Error('Failed to load documents');
+                }
+                const documents = await response.json();
+                const documentList = document.getElementById('document-list');
+                documentList.innerHTML = '';
+                documents.forEach(doc => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="/download-document/${doc.DocumentID}" target="_blank">${doc.DocumentName}</a>`;
+                    documentList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error loading documents:', error);
+            }
+        }
+
+        async function loadPropertyDetails() {
+            try {
+                const response = await fetch('/get-tenant-property');
+                if (!response.ok) {
+                    throw new Error('Failed to load property details');
+                }
+                const property = await response.json();
+                const propertyDetails = document.getElementById('property-details');
+                
+                if (property) {
+                    propertyDetails.innerHTML = `
+                        <p><strong>Property Name:</strong> ${property.PropertyName}</p>
+                        <p><strong>Address:</strong> ${property.Address}</p>
+                        <p><strong>Details:</strong> ${property.Details}</p>
+                        <p><strong>Lease Duration:</strong> ${property.LeaseDuration}</p>
+                        <p><strong>Monthly Rent:</strong> ${property.MonthlyRent}</p>
+                    `;
+                } else {
+                    propertyDetails.innerHTML = '<p>No property assigned.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading property details:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDocuments();
+            loadPropertyDetails();
+        });
+    </script>
+
+    <ul id="invite-list"></ul>
+
+    <script>
+        async function loadInvites() {
+            try {
+                const response = await fetch('/view-invites');
+                const invites = await response.json();
+                const inviteList = document.getElementById('invite-list');
+                inviteList.innerHTML = ''; 
+
+                if (invites.length === 0) {
+                    inviteList.innerHTML = '<p>No pending invites.</p>';
+                } else {
+                    invites.forEach(invite => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            Invite from Property Manager ID: ${invite.PropertyManagerID}, Sent on: ${invite.SentDate}
+                            <button onclick="respondInvite(${invite.InviteID}, 'Accepted', this)">Accept</button>
+                            <button onclick="respondInvite(${invite.InviteID}, 'Declined', this)">Decline</button>
+                        `;
+                        inviteList.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading invites:', error);
+            }
+        }
+
+        async function respondInvite(inviteID, response, buttonElement) {
+            try {
+                const inviteItem = buttonElement.parentElement;
+                inviteItem.remove();
+
+                const result = await fetch('/respond-invite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inviteID, response })
+                });
+
+                if (!result.ok) {
+                    alert('Error responding to invite');
+                    document.getElementById('invite-list').appendChild(inviteItem);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                document.getElementById('invite-list').appendChild(inviteItem);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadInvites);
+    </script>
+</body>
+</html>
